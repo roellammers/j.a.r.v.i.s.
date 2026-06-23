@@ -1,0 +1,204 @@
+/* ============================================================
+   PINGWIRE DESIGN SYSTEM — Colors & Typography
+   Source: uploads/pingwire_brand_guidelines.tsx
+   ============================================================ */
+
+/* --- Fonts: Inter is the single brand family (400–800) --- */
+/* Self-hosted Inter — 18pt optical size for UI/body, 28pt for display.
+   Files live in /fonts/. Weights 100–900 all available. */
+@font-face { font-family:'Inter'; font-weight:100; font-style:normal; src:url('fonts/Inter_18pt-Thin.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:200; font-style:normal; src:url('fonts/Inter_18pt-ExtraLight.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:300; font-style:normal; src:url('fonts/Inter_18pt-Light.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:400; font-style:normal; src:url('fonts/Inter_18pt-Regular.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:500; font-style:normal; src:url('fonts/Inter_18pt-Medium.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:600; font-style:normal; src:url('fonts/Inter_18pt-SemiBold.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:700; font-style:normal; src:url('fonts/Inter_18pt-Bold.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:800; font-style:normal; src:url('fonts/Inter_18pt-ExtraBold.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:900; font-style:normal; src:url('fonts/Inter_18pt-Black.ttf') format('truetype'); font-display:swap; }
+
+/* Italic variants */
+@font-face { font-family:'Inter'; font-weight:400; font-style:italic; src:url('fonts/Inter_18pt-Italic.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:500; font-style:italic; src:url('fonts/Inter_18pt-MediumItalic.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:600; font-style:italic; src:url('fonts/Inter_18pt-SemiBoldItalic.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:700; font-style:italic; src:url('fonts/Inter_18pt-BoldItalic.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter'; font-weight:800; font-style:italic; src:url('fonts/Inter_18pt-ExtraBoldItalic.ttf') format('truetype'); font-display:swap; }
+
+/* Display optical size (28pt) — for headlines >= 24px */
+@font-face { font-family:'Inter Display'; font-weight:600; font-style:normal; src:url('fonts/Inter_28pt-SemiBold.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter Display'; font-weight:700; font-style:normal; src:url('fonts/Inter_28pt-Bold.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter Display'; font-weight:800; font-style:normal; src:url('fonts/Inter_28pt-ExtraBold.ttf') format('truetype'); font-display:swap; }
+@font-face { font-family:'Inter Display'; font-weight:900; font-style:normal; src:url('fonts/Inter_28pt-Black.ttf') format('truetype'); font-display:swap; }
+
+:root {
+  /* ========== BRAND CORE ========== */
+  --pw-deep-forest:   #0B2920; /* Dark page background */
+  --pw-main-green:    #124131; /* Brand anchor — hero bg, nav, footer */
+  --pw-dark-green:    #238061; /* CTAs, links, active states, hover */
+  --pw-success:       #28C76F; /* Confirmations, verified states */
+  --pw-light-green-3: #ACC3BD; /* Dividers, icon fills, muted-on-dark */
+  --pw-light-green-2: #D1DCDA; /* Card surfaces */
+  --pw-bright-snow:   #F9FAFA; /* Page background (light) */
+
+  /* ========== ACCENTS (one at a time) ========== */
+  --pw-marigold:      #ECA400; /* DEFAULT primary CTA accent */
+  --pw-fresh-sky:     #00A6ED;
+  --pw-slate-indigo:  #5158BB;
+  --pw-pale-sky:      #C6E0FF;
+
+  /* ========== SEMANTIC / SECONDARY ========== */
+  --pw-flame:         #E4572E; /* Alerts, destructive only */
+  --pw-black:         #000000; /* Body copy */
+  --pw-gray-1:        #E0E0E0; /* Borders, rule lines */
+  --pw-gray-2:        #B8B8B8; /* Placeholders */
+  --pw-gray-3:        #999999; /* Secondary body text */
+
+  /* ========== LIGHT THEME TOKENS ========== */
+  --pw-bg:            var(--pw-bright-snow);
+  --pw-surface:       #FFFFFF;
+  --pw-surface-2:     var(--pw-light-green-2);
+  --pw-surface-dark:  var(--pw-main-green);
+  --pw-border:        var(--pw-light-green-2);
+  --pw-border-subtle: var(--pw-gray-1);
+  --pw-fg:            var(--pw-black);
+  --pw-fg-heading:    var(--pw-main-green);
+  --pw-fg-muted:      var(--pw-gray-3);
+  --pw-fg-placeholder:var(--pw-gray-2);
+  --pw-fg-on-dark:    #FFFFFF;
+  --pw-fg-muted-on-dark: var(--pw-light-green-3);
+
+  /* Accent live variable — defaults to Marigold */
+  --pw-accent:              var(--pw-marigold);
+  --pw-accent-text:         #1A1A1A;
+  --pw-accent-rgb:          236, 164, 0;
+  --pw-accent-glow:         rgba(236, 164, 0, 0.13);
+  --pw-accent-glow-edge:    rgba(236, 164, 0, 0.04);
+  --pw-accent-badge-bg:     rgba(236, 164, 0, 0.12);
+  --pw-accent-badge-border: rgba(236, 164, 0, 0.40);
+  --pw-accent-badge-text:   #8A6000;
+  --pw-accent-card-bg:      rgba(236, 164, 0, 0.07);
+  --pw-accent-card-border:  rgba(236, 164, 0, 0.25);
+
+  /* ========== TYPOGRAPHY ========== */
+  --pw-font-sans:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --pw-font-display: 'Inter Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --pw-font-mono:    ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  /* Type scale (matches brand guidelines) */
+  --pw-fs-display: 48px;  --pw-fw-display: 800; --pw-lh-display: 1.05;
+  --pw-fs-h1:      48px;  --pw-fw-h1:      800; --pw-lh-h1:      1.05;
+  --pw-fs-h2:      36px;  --pw-fw-h2:      700; --pw-lh-h2:      1.15;
+  --pw-fs-h3:      24px;  --pw-fw-h3:      600; --pw-lh-h3:      1.25;
+  --pw-fs-h4:      18px;  --pw-fw-h4:      600; --pw-lh-h4:      1.35;
+  --pw-fs-body-lg: 16px;  --pw-fw-body:    400; --pw-lh-body:    1.65;
+  --pw-fs-body:    14px;
+  --pw-fs-caption: 12px;  --pw-fw-caption: 600; --pw-lh-caption: 1.5;
+
+  /* Tracking */
+  --pw-tracking-display: -0.03em;
+  --pw-tracking-heading: -0.02em;
+  --pw-tracking-body:     0;
+  --pw-tracking-caps:     0.08em;
+  --pw-tracking-caps-lg:  0.14em;
+
+  /* ========== SPACING — 4px base ========== */
+  --pw-sp-1:  4px;   /* icon gap, tight inline labels */
+  --pw-sp-2:  8px;   /* badge padding, inline spacing */
+  --pw-sp-3:  12px;  /* button padding-y, input internal */
+  --pw-sp-4:  16px;  /* button padding-x, sm card padding */
+  --pw-sp-5:  24px;  /* card padding, component gap */
+  --pw-sp-6:  32px;  /* card gap, row spacing */
+  --pw-sp-7:  48px;  /* section padding, column gap */
+  --pw-sp-8:  64px;  /* hero padding, section gap */
+  --pw-sp-9:  96px;  /* page section margin */
+
+  /* ========== RADII ========== */
+  --pw-radius-sm:   4px;
+  --pw-radius-md:   8px;   /* default for buttons, inputs */
+  --pw-radius-lg:   12px;  /* default for cards */
+  --pw-radius-xl:   16px;  /* hero, modal */
+  --pw-radius-2xl:  20px;  /* cover, big hero */
+  --pw-radius-pill: 9999px;
+
+  /* ========== SHADOWS ========== */
+  --pw-shadow-card:     0 1px 4px  rgba(18, 65, 49, 0.10);
+  --pw-shadow-card-sm:  0 1px 4px  rgba(18, 65, 49, 0.08);
+  --pw-shadow-elevated: 0 4px 16px rgba(18, 65, 49, 0.14);
+  --pw-shadow-modal:    0 20px 48px rgba(18, 65, 49, 0.22);
+  --pw-shadow-cta:      0 0 20px  rgba(var(--pw-accent-rgb), 0.40);
+  --pw-shadow-cta-soft: 0 0 20px  rgba(var(--pw-accent-rgb), 0.35);
+  --pw-shadow-hero:     0 4px 32px rgba(18, 65, 49, 0.08);
+  --pw-shadow-hero-dark:0 4px 32px rgba(0,  0,  0,  0.30);
+}
+
+/* ========== DARK THEME ========== */
+[data-theme="dark"], .pw-dark {
+  --pw-bg:            var(--pw-deep-forest);
+  --pw-surface:       var(--pw-main-green);
+  --pw-surface-2:     #1A4D3A;
+  --pw-surface-dark:  var(--pw-deep-forest);
+  --pw-border:        rgba(172, 195, 189, 0.15);
+  --pw-border-subtle: rgba(172, 195, 189, 0.10);
+  --pw-fg:            #E5EBEA;
+  --pw-fg-heading:    #FFFFFF;
+  --pw-fg-muted:      var(--pw-light-green-3);
+  --pw-fg-placeholder:#5A8A78;
+}
+
+/* ========== ACCENT SWITCHERS ========== */
+[data-accent="fresh-sky"] {
+  --pw-accent: #00A6ED; --pw-accent-text:#FFFFFF; --pw-accent-rgb:0,166,237;
+  --pw-accent-glow: rgba(0,166,237,0.12); --pw-accent-badge-bg: rgba(0,166,237,0.10);
+  --pw-accent-badge-border: rgba(0,166,237,0.38); --pw-accent-badge-text:#006FA8;
+  --pw-accent-card-bg: rgba(0,166,237,0.07); --pw-accent-card-border: rgba(0,166,237,0.22);
+}
+[data-accent="slate-indigo"] {
+  --pw-accent:#5158BB; --pw-accent-text:#FFFFFF; --pw-accent-rgb:81,88,187;
+  --pw-accent-glow: rgba(81,88,187,0.11); --pw-accent-badge-bg: rgba(81,88,187,0.10);
+  --pw-accent-badge-border: rgba(81,88,187,0.35); --pw-accent-badge-text:#3A3F8F;
+  --pw-accent-card-bg: rgba(81,88,187,0.07); --pw-accent-card-border: rgba(81,88,187,0.22);
+}
+[data-accent="pale-sky"] {
+  --pw-accent:#C6E0FF; --pw-accent-text:#1A3A5C; --pw-accent-rgb:198,224,255;
+  --pw-accent-glow: rgba(198,224,255,0.45); --pw-accent-badge-bg: rgba(198,224,255,0.40);
+  --pw-accent-badge-border: rgba(100,160,230,0.45); --pw-accent-badge-text:#1A5A9A;
+  --pw-accent-card-bg: rgba(198,224,255,0.25); --pw-accent-card-border: rgba(100,160,230,0.30);
+}
+
+/* ========== SEMANTIC ELEMENT STYLES ========== */
+.pw { font-family: var(--pw-font-sans); color: var(--pw-fg); background: var(--pw-bg); }
+
+h1, .pw-h1 {
+  font-family: var(--pw-font-display); font-size: var(--pw-fs-h1);
+  font-weight: var(--pw-fw-h1); line-height: var(--pw-lh-h1);
+  letter-spacing: var(--pw-tracking-display); color: var(--pw-fg-heading);
+  margin: 0;
+}
+h2, .pw-h2 {
+  font-family: var(--pw-font-display);
+  font-size: var(--pw-fs-h2); font-weight: var(--pw-fw-h2); line-height: var(--pw-lh-h2);
+  letter-spacing: var(--pw-tracking-heading); color: var(--pw-fg-heading); margin: 0;
+}
+h3, .pw-h3 {
+  font-family: var(--pw-font-display);
+  font-size: var(--pw-fs-h3); font-weight: var(--pw-fw-h3); line-height: var(--pw-lh-h3);
+  color: var(--pw-fg-heading); margin: 0;
+}
+h4, .pw-h4 {
+  font-size: var(--pw-fs-h4); font-weight: var(--pw-fw-h4); line-height: var(--pw-lh-h4);
+  color: var(--pw-fg-heading); margin: 0;
+}
+p, .pw-body {
+  font-size: var(--pw-fs-body); font-weight: var(--pw-fw-body);
+  line-height: var(--pw-lh-body); color: var(--pw-fg); margin: 0;
+}
+.pw-body-lg { font-size: var(--pw-fs-body-lg); line-height: var(--pw-lh-body); }
+.pw-caption {
+  font-size: var(--pw-fs-caption); font-weight: var(--pw-fw-caption);
+  line-height: var(--pw-lh-caption); letter-spacing: var(--pw-tracking-caps);
+  text-transform: uppercase; color: var(--pw-fg-muted);
+}
+.pw-muted { color: var(--pw-fg-muted); }
+.pw-mono  { font-family: var(--pw-font-mono); }
+
+/* No italic in UI — per brand rules */
+.pw em, .pw i { font-style: normal; font-weight: 600; }

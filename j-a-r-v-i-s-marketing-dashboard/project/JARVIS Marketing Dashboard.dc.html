@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>J.A.R.V.I.S. Marketing Dashboard</title>
+<style>
+  @font-face { font-family: "Inter"; font-weight: 400; src: url("fonts/Inter_18pt-Regular.ttf") format("truetype"); font-display: swap; }
+  @font-face { font-family: "Inter"; font-weight: 500; src: url("fonts/Inter_18pt-Medium.ttf") format("truetype"); font-display: swap; }
+  @font-face { font-family: "Inter"; font-weight: 600; src: url("fonts/Inter_18pt-SemiBold.ttf") format("truetype"); font-display: swap; }
+  @font-face { font-family: "Inter"; font-weight: 700; src: url("fonts/Inter_18pt-Bold.ttf") format("truetype"); font-display: swap; }
+  @font-face { font-family: "Inter"; font-weight: 800; src: url("fonts/Inter_18pt-ExtraBold.ttf") format("truetype"); font-display: swap; }
+
+  :root {
+    --page: #03100b;
+    --forest: #0b2920;
+    --main: #124131;
+    --panel: rgba(11, 41, 32, 0.56);
+    --panel-deep: rgba(4, 15, 11, 0.62);
+    --accent: #00a6ed;
+    --accent-2: #4fd2ff;
+    --pale: #c6e0ff;
+    --amber: #eca400;
+    --good: #28c76f;
+    --bad: #e4572e;
+    --text: #dceaf2;
+    --muted: #6e96a0;
+    --line: rgba(0, 166, 237, 0.16);
+    --line-strong: rgba(0, 166, 237, 0.28);
+    --mono: "Inter", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+    --sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--page); }
+  body {
+    overflow: hidden;
+    font-family: var(--sans);
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  button, input, select, textarea { font: inherit; }
+  button:focus-visible {
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(0, 166, 237, 0.22), 0 0 14px rgba(0, 166, 237, 0.42);
+  }
+
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(0, 166, 237, 0.25); border-radius: 3px; }
+
+  .app {
+    --chrome-pad: 15px;
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    min-height: 680px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background:
+      radial-gradient(125% 85% at 50% -5%, #0d3327 0%, rgba(7, 32, 22, 0.54) 42%, var(--page) 100%);
+  }
+
+  .topbar {
+    height: 62px;
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 22px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(11, 41, 32, 0.55), transparent);
+  }
+
+  .brand {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .brand__title {
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .brand__title span { color: var(--accent-2); font-weight: 600; }
+
+  .brand__subtitle,
+  .meta,
+  .mono {
+    font-family: var(--mono);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .brand__subtitle {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    white-space: nowrap;
+  }
+
+  .status-strip {
+    display: flex;
+    gap: 8px;
+    margin-left: 6px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 26px;
+    padding: 5px 10px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    color: var(--accent-2);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .pill--good {
+    color: #7ee0a8;
+    border-color: rgba(40, 199, 111, 0.32);
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: 0 0 7px currentColor;
+    animation: jblink 2.6s infinite;
+  }
+
+  .topbar__spacer { flex: 1; }
+
+  .clock {
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    text-align: right;
+  }
+
+  #clock {
+    font-family: var(--mono);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--accent-2);
+    line-height: 1;
+    text-shadow: 0 0 12px rgba(79, 210, 255, 0.42);
+  }
+
+  .meta {
+    color: var(--muted);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    line-height: 1.25;
+  }
+
+  .meta span { color: var(--text); }
+
+  .dashboard {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 318px minmax(460px, 1fr) 344px;
+  }
+
+  .rail {
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: var(--chrome-pad);
+    overflow-y: auto;
+  }
+
+  .center {
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+
+  .orb-stage {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .orb-stage canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .mode-control {
+    position: absolute;
+    top: 16px;
+    left: 50%;
+    z-index: 3;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    max-width: calc(100% - 28px);
+  }
+
+  .button {
+    min-height: 30px;
+    padding: 7px 15px;
+    border: 1px solid var(--line-strong);
+    border-radius: 4px;
+    background: rgba(0, 166, 237, 0.07);
+    color: var(--accent-2);
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .button:hover { background: rgba(0, 166, 237, 0.12); }
+  .button.is-active {
+    background: var(--accent);
+    color: #04130d;
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(0, 166, 237, 0.5);
+  }
+
+  .orb-caption {
+    position: absolute;
+    left: 50%;
+    bottom: 18px;
+    z-index: 3;
+    transform: translateX(-50%);
+    text-align: center;
+    pointer-events: none;
+  }
+
+  #orbstate {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.34em;
+    color: var(--accent-2);
+    text-shadow: 0 0 14px rgba(79, 210, 255, 0.5);
+    white-space: nowrap;
+  }
+
+  .orb-caption__sub {
+    margin-top: 4px;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    color: var(--muted);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .panel {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: linear-gradient(180deg, var(--panel), var(--panel-deep));
+    padding: 14px 15px;
+  }
+
+  .panel::before,
+  .panel::after {
+    content: "";
+    position: absolute;
+    width: 13px;
+    height: 13px;
+    pointer-events: none;
+  }
+
+  .panel::before {
+    top: -1px;
+    left: -1px;
+    border-top: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+    border-radius: 6px 0 0 0;
+  }
+
+  .panel::after {
+    right: -1px;
+    bottom: -1px;
+    border-right: 2px solid var(--accent);
+    border-bottom: 2px solid var(--accent);
+    border-radius: 0 0 6px 0;
+  }
+
+  .panel--flex {
+    flex: 1;
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel__head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .panel__head--tight { margin-bottom: 10px; }
+
+  .panel__beacon {
+    width: 6px;
+    height: 6px;
+    flex: none;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .panel__beacon--amber {
+    background: var(--amber);
+    box-shadow: 0 0 8px var(--amber);
+  }
+
+  .panel__title {
+    color: var(--accent-2);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .panel__rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, rgba(0, 166, 237, 0.4), transparent);
+  }
+
+  .panel__tag {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .vital { margin-bottom: 11px; }
+  .vital:last-child { margin-bottom: 0; }
+
+  .vital__top,
+  .okr__head,
+  .kr__row,
+  .agent,
+  .log-line {
+    font-family: var(--mono);
+  }
+
+  .vital__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 5px;
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .vital__value { color: var(--accent-2); }
+
+  .bar-track {
+    position: relative;
+    height: 5px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(0, 166, 237, 0.10);
+  }
+
+  .bar-fill {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    box-shadow: 0 0 8px rgba(0, 166, 237, 0.62);
+    transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .stream {
+    height: 138px;
+    overflow: hidden;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 600;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22px);
+    mask-image: linear-gradient(180deg, transparent 0, #000 22px);
+  }
+
+  .stream--tall {
+    flex: 1;
+    min-height: 110px;
+  }
+
+  .log-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2.5px 0;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .log-line.is-visible { opacity: 1; }
+  .log-line__time { flex: none; color: var(--muted); }
+  .log-line__msg {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+  }
+
+  .log-line--error .log-line__msg { color: #f0a08c; }
+
+  .log-line__badge {
+    flex: none;
+    padding: 1px 6px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+    background: rgba(40, 199, 111, 0.06);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+  }
+
+  .agents {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-y: auto;
+  }
+
+  .agent {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 6px;
+    border-radius: 4px;
+    transition: background 0.15s ease;
+  }
+
+  .agent:hover { background: rgba(0, 166, 237, 0.08); }
+
+  .agent__avatar {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(0, 166, 237, 0.28);
+    border-radius: 5px;
+    display: grid;
+    place-items: center;
+    color: #cfeaf6;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .agent__avatar--lead {
+    border-color: rgba(40, 199, 111, 0.5);
+    color: #bdf3d4;
+    box-shadow: 0 0 9px rgba(40, 199, 111, 0.4);
+  }
+
+  .agent__body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    line-height: 1.25;
+  }
+
+  .agent__name {
+    color: var(--text);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .agent__role {
+    color: var(--muted);
+    font-size: 8.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .agent__status {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .agent__status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+
+  .agent__status-dot--glow { box-shadow: 0 0 6px currentColor; }
+  .agent__status-dot--pulse { animation: jblink 1.6s infinite; }
+
+  .budget {
+    flex: none;
+    margin: 0 16px 16px;
+    padding: 14px 18px 13px;
+    border-color: rgba(0, 166, 237, 0.22);
+    background: linear-gradient(180deg, rgba(11, 41, 32, 0.62), rgba(4, 15, 11, 0.6));
+  }
+
+  .budget__corner {
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    pointer-events: none;
+  }
+
+  .budget__corner--tr {
+    top: -1px;
+    right: -1px;
+    border-top: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    border-radius: 0 6px 0 0;
+  }
+
+  .budget__corner--bl {
+    bottom: -1px;
+    left: -1px;
+    border-bottom: 2px solid var(--accent);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 0 0 6px;
+  }
+
+  .mini-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #7ee0a8;
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .view-toggle {
+    display: flex;
+    gap: 5px;
+    margin-left: 6px;
+  }
+
+  .view-toggle .button {
+    min-height: 24px;
+    padding: 4px 9px;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+  }
+
+  .budget-view {
+    display: none;
+    align-items: stretch;
+    gap: 18px;
+    min-height: 96px;
+  }
+
+  .budget-view.is-active { display: flex; }
+
+  .budget-number {
+    flex: none;
+    min-width: 152px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .label {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .big-number {
+    color: #fff;
+    font-family: var(--mono);
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    text-shadow: 0 0 16px rgba(79, 210, 255, 0.35);
+  }
+
+  .unit {
+    color: var(--accent-2);
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.2em;
+  }
+
+  .histo {
+    flex: 1;
+    min-width: 0;
+    height: 84px;
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+  }
+
+  .histo__col {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+  }
+
+  .histo__bar {
+    width: 62%;
+    height: 0;
+    border-radius: 2px 2px 0 0;
+    background: linear-gradient(180deg, rgba(79, 210, 255, 0.53), rgba(0, 166, 237, 0.4));
+    transition: height 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .histo__bar--current {
+    background: linear-gradient(180deg, var(--amber), rgba(236, 164, 0, 0.8));
+    box-shadow: 0 0 12px var(--amber);
+    animation: jpulse 1.8s ease-in-out infinite;
+  }
+
+  .histo__label {
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+  }
+
+  .histo__label--current { color: var(--amber); }
+
+  .budget-summary {
+    flex: none;
+    min-width: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+    padding-left: 18px;
+    border-left: 1px solid var(--line);
+  }
+
+  .budget-summary strong {
+    color: var(--accent-2);
+    font-family: var(--mono);
+    font-size: 18px;
+    font-weight: 800;
+  }
+
+  .budget-summary strong.is-amber { color: var(--amber); }
+  .budget-summary span { color: var(--muted); font-size: 10px; }
+
+  .budget-view--month {
+    align-items: center;
+    gap: 26px;
+  }
+
+  .budget-view--month .budget-number { min-width: 260px; }
+  .budget-view--month .big-number span { color: var(--accent-2); font-size: 14px; letter-spacing: 0.16em; }
+  .budget-view--month .unit { color: var(--muted); font-size: 10px; letter-spacing: 0.12em; }
+
+  .spark-wrap {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .spark {
+    height: 54px;
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+  }
+
+  .spark__bar {
+    flex: 1;
+    min-width: 4px;
+    border-radius: 2px;
+    background: rgba(0, 166, 237, 0.6);
+  }
+
+  .spark__bar--current {
+    background: var(--amber);
+    box-shadow: 0 0 10px var(--amber);
+  }
+
+  .okr__head {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 14px 0 9px;
+  }
+
+  .okr__head:first-child { margin-top: 2px; }
+  .okr__id { color: var(--accent); font-size: 11px; font-weight: 800; letter-spacing: 0.1em; }
+  .okr__title {
+    flex: 1;
+    min-width: 0;
+    color: var(--text);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .okr__roll { color: var(--muted); font-size: 11px; font-weight: 800; }
+
+  .kr { margin-bottom: 9px; }
+  .kr__row {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10px;
+    font-weight: 700;
+  }
+  .kr__dot {
+    width: 7px;
+    height: 7px;
+    flex: none;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: 0 0 7px currentColor;
+  }
+  .kr__name {
+    flex: 1;
+    min-width: 0;
+    color: var(--text);
+    letter-spacing: 0.04em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .kr__value { flex: none; color: var(--accent-2); }
+  .kr__track {
+    position: relative;
+    height: 6px;
+    margin-top: 5px;
+    overflow: visible;
+    border-radius: 999px;
+    background: rgba(0, 166, 237, 0.10);
+  }
+  .kr__fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    border-radius: inherit;
+    background: currentColor;
+    box-shadow: 0 0 7px currentColor;
+    transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .kr__tick {
+    position: absolute;
+    top: -2px;
+    bottom: -2px;
+    width: 1px;
+    background: rgba(220, 234, 242, 0.45);
+  }
+
+  .legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 11px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0, 166, 237, 0.12);
+  }
+
+  .legend__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .legend__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 999px;
+    background: currentColor;
+    box-shadow: 0 0 6px currentColor;
+  }
+
+  .wave {
+    width: 100%;
+    height: 58px;
+    display: block;
+  }
+
+  @keyframes jblink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.22; }
+  }
+
+  @keyframes jpulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.72; transform: scaleY(0.92); }
+  }
+
+  @media (max-width: 1180px) {
+    body { overflow: auto; }
+    .app { width: 100%; min-height: 100vh; height: auto; overflow: visible; }
+    .topbar { height: auto; min-height: 62px; flex-wrap: wrap; padding: 14px 18px; }
+    .status-strip { order: 3; width: 100%; margin-left: 0; overflow-x: auto; padding-bottom: 2px; }
+    .clock { min-width: 210px; margin-left: auto; }
+    .dashboard {
+      grid-template-columns: minmax(280px, 320px) minmax(420px, 1fr);
+      min-height: 900px;
+    }
+    .rail--right {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      align-items: stretch;
+    }
+    .rail--right .panel--flex { min-height: 260px; }
+  }
+
+  @media (max-width: 820px) {
+    .app { min-height: 0; }
+    .topbar { align-items: flex-start; }
+    .brand { width: 100%; }
+    .brand__title { font-size: 14px; white-space: normal; }
+    .brand__subtitle { white-space: normal; line-height: 1.4; }
+    .clock { min-width: 0; width: 100%; text-align: left; }
+    .dashboard { display: flex; flex-direction: column; min-height: 0; }
+    .rail, .rail--right { display: flex; flex-direction: column; overflow: visible; }
+    .center { min-height: 620px; }
+    .mode-control { width: calc(100% - 28px); overflow-x: auto; justify-content: flex-start; }
+    .button { flex: none; padding-inline: 12px; }
+    .budget { margin: 0 15px 15px; }
+    .budget .panel__head { flex-wrap: wrap; }
+    .budget-view,
+    .budget-view--month { flex-direction: column; gap: 14px; }
+    .budget-summary {
+      min-width: 0;
+      padding-left: 0;
+      padding-top: 12px;
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .histo { min-height: 84px; }
+    .legend { flex-wrap: wrap; gap: 10px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+  }
+</style>
+</head>
+<body>
+<main class="app" aria-label="J.A.R.V.I.S. Marketing Dashboard">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand__title">PINGWIRE <span>// MARKETING CONTROL</span></div>
+      <div class="brand__subtitle">J.A.R.V.I.S. // JUST A RATHER VERY INTELLIGENT SYSTEM</div>
+    </div>
+
+    <div class="status-strip" aria-label="System status">
+      <span class="pill pill--good"><span class="dot" aria-hidden="true"></span>Online</span>
+      <span class="pill"><span class="dot" aria-hidden="true"></span>Secure</span>
+      <span class="pill"><span class="dot" aria-hidden="true"></span>Encrypted</span>
+    </div>
+
+    <div class="topbar__spacer" aria-hidden="true"></div>
+
+    <div class="clock">
+      <time id="clock" datetime="">00:00:00.000</time>
+      <div class="meta">SES <span id="ses">0x00</span> // <span id="coord">59.3293 N 18.0686 E</span> // BRG <span id="brg">000</span></div>
+    </div>
+  </header>
+
+  <section class="dashboard">
+    <aside class="rail rail--left" aria-label="System telemetry">
+      <section class="panel">
+        <header class="panel__head">
+          <span class="panel__beacon" aria-hidden="true"></span>
+          <span class="panel__title">System vitals</span>
+          <span class="panel__rule" aria-hidden="true"></span>
+          <span class="panel__tag">Core v4.2</span>
+        </header>
+        <div id="vitals"></div>
+      </section>
+
+      <section class="panel">
+        <header class="panel__head panel__head--tight">
+          <span class="panel__beacon" aria-hidden="true"></span>
+          <span class="panel__title">Telemetry</span>
+          <span class="panel__rule" aria-hidden="true"></span>
+          <span class="panel__tag">Stream</span>
+        </header>
+        <div id="telemetry" class="stream" aria-live="polite"></div>
+      </section>
+
+      <section class="panel panel--flex">
+        <header class="panel__head">
+          <span class="panel__beacon" aria-hidden="true"></span>
+          <span class="panel__title">Marketing agents</span>
+          <span class="panel__rule" aria-hidden="true"></span>
+          <span id="agentcount" class="panel__tag">0/0</span>
+        </header>
+        <div id="agents" class="agents"></div>
+      </section>
+    </aside>
+
+    <section class="center" aria-label="Neural interface">
+      <div class="orb-stage">
+        <canvas id="orb" aria-label="Animated neural particle interface"></canvas>
+        <div class="mode-control" role="group" aria-label="Interface mode">
+          <button class="button mode-button" type="button" data-mode="AUTO" aria-pressed="false">Auto</button>
+          <button class="button mode-button" type="button" data-mode="IDLE" aria-pressed="false">Idle</button>
+          <button class="button mode-button" type="button" data-mode="THINKING" aria-pressed="false">Thinking</button>
+          <button class="button mode-button" type="button" data-mode="TALKING" aria-pressed="false">Talking</button>
+        </div>
+
+        <div class="orb-caption">
+          <div id="orbstate">Idle</div>
+          <div class="orb-caption__sub">Neural interface active</div>
+        </div>
+      </div>
+
+      <section class="panel budget" aria-label="Marketing budget FY2026">
+        <span class="budget__corner budget__corner--tr" aria-hidden="true"></span>
+        <span class="budget__corner budget__corner--bl" aria-hidden="true"></span>
+        <header class="panel__head">
+          <span class="panel__beacon panel__beacon--amber" aria-hidden="true"></span>
+          <span class="panel__title">Marketing budget // FY2026</span>
+          <span class="panel__rule" aria-hidden="true"></span>
+          <span class="mini-status"><span class="dot" aria-hidden="true"></span>On track</span>
+          <div class="view-toggle" role="group" aria-label="Budget view">
+            <button class="button budget-button" type="button" data-view="allocation" aria-pressed="false">Allocation</button>
+            <button class="button budget-button" type="button" data-view="month" aria-pressed="false">This month</button>
+          </div>
+        </header>
+
+        <div id="budget-allocation" class="budget-view is-active">
+          <div class="budget-number">
+            <span class="label">Annual</span>
+            <strong class="big-number">734,564</strong>
+            <span class="unit">SEK</span>
+          </div>
+
+          <div id="histo" class="histo" aria-label="Monthly budget allocation histogram"></div>
+
+          <div class="budget-summary">
+            <div>
+              <span class="label">Allocated // Jan-Jun</span><br>
+              <strong>378,500 <span>SEK</span></strong>
+            </div>
+            <div>
+              <span class="label">Year elapsed</span><br>
+              <strong class="is-amber">52<span>%</span></strong>
+            </div>
+          </div>
+        </div>
+
+        <div id="budget-month" class="budget-view budget-view--month">
+          <div class="budget-number">
+            <span class="label">Current period // Jun-26</span>
+            <strong class="big-number">17,956 <span>SEK</span></strong>
+            <span class="unit">2.4% of annual // 734,564 SEK FY total</span>
+          </div>
+          <div class="spark-wrap">
+            <span class="label">12-month allocation trace</span>
+            <div id="spark" class="spark" aria-label="12 month allocation trace"></div>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <aside class="rail rail--right" aria-label="Marketing operations">
+      <section class="panel">
+        <header class="panel__head">
+          <span class="panel__beacon" aria-hidden="true"></span>
+          <span class="panel__title">Marketing OKRs</span>
+          <span class="panel__rule" aria-hidden="true"></span>
+          <span class="panel__tag">Q2 2026</span>
+        </header>
+        <div id="okr"></div>
+        <div class="legend" aria-label="OKR status legend">
+          <span class="legend__item" style="color: var(--good);"><span class="legend__dot" aria-hidden="true"></span>On track</span>
+          <span class="legend__item" style="color: var(--amber);"><span class="legend__dot" aria-hidden="true"></span>At risk</span>
+          <span class="legend__item" style="color: var(--bad);"><span class="legend__dot" aria-hidden="true"></span>Off track</span>
+        </div>
+      </section>
+
+      <section class="panel">
+        <header class="panel__head panel__head--tight">
+          <span class="panel__beacon" aria-hidden="true"></span>
+          <span class="panel__title">Audio I/O</span>
+          <span class="panel__rule" aria-hidden="true"></span>
+          <span id="audlabel" class="panel__tag">RX // Monitoring</span>
+        </header>
+        <canvas id="wave" class="wave" aria-label="Audio waveform monitor"></canvas>
+      </section>
+
+      <section class="panel panel--flex">
+        <header class="panel__head panel__head--tight">
+          <span class="panel__beacon" aria-hidden="true"></span>
+          <span class="panel__title">Diagnostics</span>
+          <span class="panel__rule" aria-hidden="true"></span>
+          <span class="panel__tag">Ops</span>
+        </header>
+        <div id="diag" class="stream stream--tall" aria-live="polite"></div>
+      </section>
+    </aside>
+  </section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const C = {
+    accent: "#00A6ED",
+    accent2: "#4FD2FF",
+    pale: "#C6E0FF",
+    amber: "#ECA400",
+    good: "#28C76F",
+    bad: "#E4572E",
+    muted: "#6E96A0",
+    fade: "rgba(5,18,13,0.30)"
+  };
+
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const timers = [];
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const pad = (n, w) => String(n).padStart(w, "0");
+  const fmt = (n) => n.toLocaleString("en-US");
+
+  const state = {
+    mode: "AUTO",
+    autoMode: "IDLE",
+    autoTimer: 0,
+    autoIdx: 0,
+    raf: null,
+    resizeObserver: null
+  };
+
+  function setTimer(id, kind = "interval") {
+    timers.push({ id, kind });
+    return id;
+  }
+
+  function initTopbar() {
+    const clock = $("#clock");
+    const brg = $("#brg");
+    const coord = $("#coord");
+    const ses = $("#ses");
+    let bearing = Math.random() * 360;
+
+    ses.textContent = "0x" + Math.floor(Math.random() * 0xffffff).toString(16).toUpperCase().padStart(6, "0");
+
+    const tickClock = () => {
+      const d = new Date();
+      const value = `${pad(d.getHours(), 2)}:${pad(d.getMinutes(), 2)}:${pad(d.getSeconds(), 2)}.${pad(d.getMilliseconds(), 3)}`;
+      clock.textContent = value;
+      clock.setAttribute("datetime", d.toISOString());
+    };
+
+    const tickMeta = () => {
+      bearing = (bearing + 0.7) % 360;
+      brg.textContent = pad(Math.round(bearing), 3);
+      const la = (59.3293 + (Math.random() - 0.5) * 0.0009).toFixed(4);
+      const lo = (18.0686 + (Math.random() - 0.5) * 0.0009).toFixed(4);
+      coord.textContent = `${la} N ${lo} E`;
+    };
+
+    tickClock();
+    tickMeta();
+    if (!reduced) {
+      setTimer(setInterval(tickClock, 41));
+      setTimer(setInterval(tickMeta, 1100));
+    }
+  }
+
+  function initVitals() {
+    const vitalsDef = [
+      { k: "Neural core", fmt: (v) => `${v.toFixed(1)}%`, base: 98.4, bar: () => 96 + Math.random() * 3.5, jit: 0.6 },
+      { k: "Memory", fmt: (v) => `${v.toFixed(1)}%`, base: 62.8, bar: () => 58 + Math.random() * 12, jit: 2.5 },
+      { k: "Latency", fmt: (v) => `${Math.round(v)} ms`, base: 14, bar: (v) => 100 - Math.min(v, 60), jit: 5 },
+      { k: "Signal", fmt: (v) => `${Math.round(v)}%`, base: 92, bar: (v) => v, jit: 4 },
+      { k: "Thermal", fmt: (v) => `${Math.round(v)} C`, base: 41, bar: (v) => v + 18, jit: 3 },
+      { k: "Throughput", fmt: (v) => `${v.toFixed(1)} GB/s`, base: 2.4, bar: (v) => v * 30, jit: 0.5 }
+    ];
+
+    const wrap = $("#vitals");
+    const nodes = vitalsDef.map((d) => {
+      const row = document.createElement("div");
+      row.className = "vital";
+      row.innerHTML = `
+        <div class="vital__top">
+          <span>${d.k}</span>
+          <span class="vital__value">--</span>
+        </div>
+        <div class="bar-track"><div class="bar-fill"></div></div>
+      `;
+      wrap.appendChild(row);
+      return { def: d, value: $(".vital__value", row), fill: $(".bar-fill", row) };
+    });
+
+    const update = (node) => {
+      const v = node.def.base + (Math.random() - 0.5) * 2 * node.def.jit;
+      node.value.textContent = node.def.fmt(v);
+      const pct = Math.max(4, Math.min(100, node.def.bar(v)));
+      node.fill.style.width = `${pct.toFixed(1)}%`;
+    };
+
+    nodes.forEach(update);
+    setTimer(setTimeout(() => nodes.forEach(update), 60), "timeout");
+    if (!reduced) setTimer(setInterval(() => nodes.forEach(update), 2000));
+  }
+
+  function initOKRs() {
+    const okrs = [
+      { obj: "OBJ-1", title: "Drive a scalable demand engine", roll: 37, krs: [
+        { id: "KR-1.1", name: "Mkt-sourced new ARR", val: "0.6M / 5.6M", fill: 10.7, start: 0, rag: "good" },
+        { id: "KR-1.2", name: "Mkt-sourced pipeline", val: "11.1M / 20M", fill: 55.5, start: 0, rag: "good" },
+        { id: "KR-1.3", name: "Intros sourced", val: "12 / 27", fill: 44.4, start: 0, rag: "amber" }
+      ] },
+      { obj: "OBJ-2", title: "Build measurable brand trust", roll: 43, krs: [
+        { id: "KR-2.1", name: "Top-of-funnel traffic", val: "10,487 / 10,600", fill: 98.9, start: 0, rag: "good" },
+        { id: "KR-2.2", name: "LinkedIn followers", val: "243 / 1,000", fill: 24.3, start: 18, rag: "bad" },
+        { id: "KR-2.3", name: "Visitor -> demo conv.", val: "0.03% / 0.60%", fill: 5, start: 26.7, rag: "bad" }
+      ] }
+    ];
+
+    const ragCol = { good: C.good, amber: C.amber, bad: C.bad };
+    const wrap = $("#okr");
+
+    okrs.forEach((objective) => {
+      const head = document.createElement("div");
+      head.className = "okr__head";
+      head.innerHTML = `
+        <span class="okr__id">${objective.obj}</span>
+        <span class="okr__title">${objective.title}</span>
+        <span class="okr__roll">${objective.roll}%</span>
+      `;
+      wrap.appendChild(head);
+
+      objective.krs.forEach((kr) => {
+        const color = ragCol[kr.rag];
+        const row = document.createElement("div");
+        row.className = "kr";
+        row.style.color = color;
+        row.innerHTML = `
+          <div class="kr__row">
+            <span class="kr__dot" aria-hidden="true"></span>
+            <span class="kr__name">${kr.id} // ${kr.name}</span>
+            <span class="kr__value">${kr.val}</span>
+          </div>
+          <div class="kr__track">
+            <div class="kr__fill" data-fill="${kr.fill}"></div>
+            ${kr.start > 0 ? `<span class="kr__tick" style="left:${kr.start}%"></span>` : ""}
+          </div>
+        `;
+        wrap.appendChild(row);
+      });
+    });
+
+    const animate = () => $$(".kr__fill", wrap).forEach((fill) => {
+      fill.style.width = `${Math.max(2, parseFloat(fill.dataset.fill)).toFixed(1)}%`;
+    });
+    if (reduced) animate();
+    else setTimer(setTimeout(animate, 120), "timeout");
+  }
+
+  function initAgents() {
+    const agents = [
+      { name: "HILDA", role: "EVENT MANAGER", glyph: "H", status: "ONLINE" },
+      { name: "HERMES", role: "ORCHESTRATOR", glyph: "◆", status: "ONLINE", lead: true },
+      { name: "BJÖRN", role: "COPYWRITER", glyph: "B", status: "ACTIVE" },
+      { name: "MAJA", role: "SEO SPECIALIST", glyph: "M", status: "ONLINE" },
+      { name: "ASTRID", role: "PAID MEDIA SPECIALIST", glyph: "A", status: "ACTIVE" },
+      { name: "INGRID", role: "SOCIAL MEDIA MANAGER", glyph: "I", status: "ONLINE" },
+      { name: "SVEN", role: "DATA ANALYST", glyph: "S", status: "SYNCING" },
+      { name: "SIGRID", role: "CONTENT STRATEGIST", glyph: "S", status: "ONLINE" },
+      { name: "FREYA", role: "DESIGNER", glyph: "F", status: "IDLE" },
+      { name: "ERIK", role: "CMO", glyph: "E", status: "ONLINE" },
+      { name: "SAGA", role: "AI MARKETING SPECIALIST", glyph: "S", status: "RUNNING" },
+      { name: "VIDAR", role: "CONCIERGE", glyph: "V", status: "STANDBY" },
+      { name: "TOR", role: "RESEARCH AGENT", glyph: "T", status: "ONLINE" }
+    ];
+
+    const statusStyle = {
+      ONLINE: { c: C.good, glow: true, pulse: false },
+      RUNNING: { c: C.good, glow: true, pulse: true },
+      ACTIVE: { c: C.accent2, glow: true, pulse: true },
+      SYNCING: { c: C.accent2, glow: true, pulse: true },
+      IDLE: { c: C.muted, glow: false, pulse: false },
+      STANDBY: { c: C.muted, glow: false, pulse: false }
+    };
+
+    const wrap = $("#agents");
+    agents.forEach((agent, i) => {
+      const hue = 158 + (i * 9) % 46;
+      const avatarBg = agent.lead
+        ? "linear-gradient(135deg, #1f8f63, #0d5a3c)"
+        : `linear-gradient(135deg, hsl(${hue}, 46%, 34%), hsl(${hue + 18}, 54%, 20%))`;
+      const status = statusStyle[agent.status] || statusStyle.ONLINE;
+      const row = document.createElement("div");
+      row.className = "agent";
+      row.innerHTML = `
+        <span class="agent__avatar ${agent.lead ? "agent__avatar--lead" : ""}" style="background:${avatarBg}">${agent.glyph}</span>
+        <span class="agent__body">
+          <span class="agent__name">${agent.name}</span>
+          <span class="agent__role">${agent.role}</span>
+        </span>
+        <span class="agent__status" style="color:${status.c}">
+          <span class="agent__status-dot ${status.glow ? "agent__status-dot--glow" : ""} ${status.pulse && !reduced ? "agent__status-dot--pulse" : ""}" aria-hidden="true"></span>
+          ${agent.status}
+        </span>
+      `;
+      wrap.appendChild(row);
+    });
+
+    const onlineCount = agents.filter((agent) => ["ONLINE", "RUNNING", "ACTIVE", "SYNCING"].includes(agent.status)).length;
+    $("#agentcount").textContent = `${onlineCount}/${agents.length}`;
+  }
+
+  function initBudget() {
+    const months = [
+      { m: "JAN", v: 11910, h: 4.9 },
+      { m: "FEB", v: 12656, h: 5.2 },
+      { m: "MAR", v: 80009, h: 32.9 },
+      { m: "APR", v: 220013, h: 90.6 },
+      { m: "MAY", v: 35956, h: 14.8 },
+      { m: "JUN", v: 17956, h: 7.4, now: true },
+      { m: "JUL", v: 10506, h: 4.3 },
+      { m: "AUG", v: 34801, h: 14.3 },
+      { m: "SEP", v: 242907, h: 100 },
+      { m: "OCT", v: 16806, h: 6.9 },
+      { m: "NOV", v: 34238, h: 14.1 },
+      { m: "DEC", v: 16806, h: 6.9 }
+    ];
+
+    const histo = $("#histo");
+    months.forEach((month) => {
+      const col = document.createElement("div");
+      col.className = "histo__col";
+      col.innerHTML = `
+        <div class="histo__bar ${month.now ? "histo__bar--current" : ""}" data-h="${month.h}" title="${month.m} ${fmt(month.v)} SEK"></div>
+        <span class="histo__label ${month.now ? "histo__label--current" : ""}">${month.m}</span>
+      `;
+      histo.appendChild(col);
+    });
+
+    const spark = $("#spark");
+    months.forEach((month) => {
+      const bar = document.createElement("div");
+      bar.className = `spark__bar ${month.now ? "spark__bar--current" : ""}`;
+      bar.style.height = `${Math.max(4, month.h)}%`;
+      bar.title = `${month.m} ${fmt(month.v)} SEK`;
+      spark.appendChild(bar);
+    });
+
+    const animate = () => $$(".histo__bar", histo).forEach((bar) => {
+      bar.style.height = `${Math.max(2, parseFloat(bar.dataset.h))}%`;
+    });
+    if (reduced) animate();
+    else setTimer(setTimeout(animate, 150), "timeout");
+
+    const buttons = $$(".budget-button");
+    const views = {
+      allocation: $("#budget-allocation"),
+      month: $("#budget-month")
+    };
+
+    const setView = (view) => {
+      Object.entries(views).forEach(([key, node]) => node.classList.toggle("is-active", key === view));
+      buttons.forEach((button) => {
+        const active = button.dataset.view === view;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    };
+
+    buttons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
+    setView("allocation");
+  }
+
+  function initLogs() {
+    const telMsgs = [
+      "core.heartbeat sync complete",
+      "signal.trace quantized",
+      "neural.mesh recalibrated",
+      "cache.layer flushed",
+      "telemetry.stream buffered",
+      "sentiment.model scored",
+      "attribution.graph resolved",
+      "audience.segment refreshed",
+      "vector.store compacted",
+      "token.rotate verified",
+      "cdn.edge warmed",
+      "anomaly.scan nominal",
+      "model.weights hot-swapped"
+    ];
+    const telErr = ["signal.trace packet loss", "cache.layer stale read", "neural.mesh sync drift"];
+    const diagMsgs = [
+      "utm.tags validated",
+      "adspend.feed reconciled",
+      "lead.score recomputed",
+      "crm.sync handshake",
+      "seo.audit pass",
+      "funnel.stage mapped",
+      "ssl.cert valid",
+      "rate.limit nominal",
+      "backup.snapshot stored",
+      "webhook.queue drained",
+      "dns.record propagated",
+      "campaign.delta merged"
+    ];
+    const diagErr = ["webhook.queue timeout", "adspend.feed retry", "crm.sync 429 throttle"];
+
+    const makeLine = (container, pool, errPool) => {
+      const d = new Date();
+      const ts = `${pad(d.getHours(), 2)}:${pad(d.getMinutes(), 2)}:${pad(d.getSeconds(), 2)}`;
+      const isErr = Math.random() < 0.12;
+      const msg = isErr ? errPool[Math.floor(Math.random() * errPool.length)] : pool[Math.floor(Math.random() * pool.length)];
+      const color = isErr ? C.bad : C.good;
+      const line = document.createElement("div");
+      line.className = `log-line ${isErr ? "log-line--error" : ""}`;
+      line.innerHTML = `
+        <span class="log-line__time">${ts}</span>
+        <span class="log-line__msg">${msg}</span>
+        <span class="log-line__badge" style="color:${color}">${isErr ? "ERR" : "OK"}</span>
+      `;
+      container.appendChild(line);
+      requestAnimationFrame(() => line.classList.add("is-visible"));
+      while (container.children.length > 16) container.removeChild(container.firstChild);
+      container.scrollTop = container.scrollHeight;
+    };
+
+    const tel = $("#telemetry");
+    const diag = $("#diag");
+    for (let i = 0; i < 7; i += 1) {
+      makeLine(tel, telMsgs, telErr);
+      makeLine(diag, diagMsgs, diagErr);
+    }
+
+    if (!reduced) {
+      const schedule = (container, pool, errPool) => {
+        const go = () => {
+          makeLine(container, pool, errPool);
+          setTimer(setTimeout(go, 3000 + Math.random() * 3000), "timeout");
+        };
+        setTimer(setTimeout(go, 3000 + Math.random() * 3000), "timeout");
+      };
+      schedule(tel, telMsgs, telErr);
+      schedule(diag, diagMsgs, diagErr);
+    }
+  }
+
+  function initButtons() {
+    const buttons = $$(".mode-button");
+    const setMode = (mode) => {
+      state.mode = mode;
+      buttons.forEach((button) => {
+        const active = button.dataset.mode === mode;
+        button.classList.toggle("is-active", active);
+        button.setAttribute("aria-pressed", String(active));
+      });
+    };
+    buttons.forEach((button) => button.addEventListener("click", () => setMode(button.dataset.mode)));
+    setMode("AUTO");
+  }
+
+  function initCanvases() {
+    const wave = $("#wave");
+    const wctx = wave.getContext("2d");
+    const bars = 52;
+    const phases = Array.from({ length: bars }, () => Math.random() * Math.PI * 2);
+    let waveW = 0;
+    let waveH = 0;
+
+    const sizeWave = () => {
+      const r = wave.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      waveW = Math.max(1, r.width);
+      waveH = Math.max(1, r.height);
+      wave.width = waveW * dpr;
+      wave.height = waveH * dpr;
+      wctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const drawWave = (t, amp) => {
+      wctx.clearRect(0, 0, waveW, waveH);
+      const barWidth = waveW / bars;
+      const mid = waveH / 2;
+      for (let i = 0; i < bars; i += 1) {
+        const env = Math.sin((i / bars) * Math.PI);
+        const h = (0.12 + 0.88 * Math.abs(Math.sin(t * 0.004 * (1 + amp) + phases[i] + i * 0.3))) * env * amp * (waveH * 0.46);
+        const x = i * barWidth + barWidth * 0.2;
+        const bw = barWidth * 0.6;
+        const gradient = wctx.createLinearGradient(0, mid - h, 0, mid + h);
+        gradient.addColorStop(0, C.accent2);
+        gradient.addColorStop(0.5, C.accent);
+        gradient.addColorStop(1, C.accent2);
+        wctx.fillStyle = gradient;
+        wctx.fillRect(x, mid - h, bw, h * 2);
+      }
+      wctx.strokeStyle = "rgba(0,166,237,.25)";
+      wctx.lineWidth = 1;
+      wctx.beginPath();
+      wctx.moveTo(0, mid);
+      wctx.lineTo(waveW, mid);
+      wctx.stroke();
+    };
+
+    const cv = $("#orb");
+    const ctx = cv.getContext("2d");
+    let W = 0;
+    let H = 0;
+    let cx = 0;
+    let cy = 0;
+    let R = 0;
+    let DPR = Math.min(window.devicePixelRatio || 1, 2);
+    const N = 1200;
+    const particles = new Array(N);
+    const sx = new Float32Array(N);
+    const sy = new Float32Array(N);
+    const sz = new Float32Array(N);
+    const sa = new Float32Array(N);
+    const ss = new Float32Array(N);
+    const connected = new Int8Array(N);
+    const goldenAngle = Math.PI * (3 - Math.sqrt(5));
+    const cell = 34;
+
+    for (let i = 0; i < N; i += 1) {
+      const y = 1 - ((i + 0.5) / N) * 2;
+      const radial = Math.sqrt(Math.max(0, 1 - y * y));
+      const theta = goldenAngle * i;
+      const x = Math.cos(theta) * radial;
+      const z = Math.sin(theta) * radial;
+      let vx = -z;
+      let vy = 0;
+      let vz = x;
+      const velocityLength = Math.hypot(vx, vy, vz) || 1;
+      vx /= velocityLength;
+      vy /= velocityLength;
+      vz /= velocityLength;
+      particles[i] = {
+        x,
+        y,
+        z,
+        vx,
+        vy,
+        vz,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.5 + Math.random() * 0.7,
+        color: Math.random()
+      };
+    }
+
+    const sizeOrb = () => {
+      const r = cv.getBoundingClientRect();
+      W = Math.max(1, r.width);
+      H = Math.max(1, r.height);
+      DPR = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = W * DPR;
+      cv.height = H * DPR;
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      cx = W / 2;
+      cy = H / 2;
+      R = Math.min(W, H) * 0.30;
+    };
+
+    const modes = {
+      IDLE: { speed: 0.28, breathe: 0.025, bf: 0.8, chaos: 0.018, glow: 0.55, audio: 0.32 },
+      THINKING: { speed: 0.55, breathe: 0.05, bf: 1.4, chaos: 0.20, glow: 0.7, audio: 0.5 },
+      TALKING: { speed: 0.85, breathe: 0.018, bf: 5.0, chaos: 0.04, glow: 0.95, audio: 1.0 }
+    };
+    const autoSeq = ["IDLE", "THINKING", "TALKING"];
+    const orbstate = $("#orbstate");
+    const audlabel = $("#audlabel");
+    let rot = 0;
+    let tilt = 0;
+    let last = performance.now();
+
+    const drawSatellites = (t) => {
+      const sr = Math.min(W, H) * 0.455;
+      for (let s = 0; s < 4; s += 1) {
+        const angle = t * 0.00018 + s * Math.PI / 2;
+        const x = cx + Math.cos(angle) * sr;
+        const y = cy + Math.sin(angle) * sr;
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate(angle + t * 0.001);
+        ctx.strokeStyle = C.accent2;
+        ctx.globalAlpha = 0.85;
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(0, -7);
+        ctx.lineTo(6, 0);
+        ctx.lineTo(0, 7);
+        ctx.lineTo(-6, 0);
+        ctx.closePath();
+        ctx.stroke();
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.arc(0, 0, 11, 0, Math.PI * 1.4);
+        ctx.stroke();
+        ctx.fillStyle = C.accent;
+        ctx.globalAlpha = 0.9;
+        ctx.fillRect(-1.3, -1.3, 2.6, 2.6);
+        ctx.restore();
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const frame = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      let modeName = state.mode;
+
+      if (modeName === "AUTO") {
+        state.autoTimer += dt;
+        if (state.autoTimer > 4.5) {
+          state.autoTimer = 0;
+          state.autoIdx = (state.autoIdx + 1) % autoSeq.length;
+          state.autoMode = autoSeq[state.autoIdx];
+        }
+        modeName = state.autoMode;
+      }
+
+      const mode = modes[modeName] || modes.IDLE;
+      orbstate.textContent = state.mode === "AUTO" ? `${modeName} // AUTO` : modeName;
+      audlabel.textContent = modeName === "TALKING" ? "TX // Synthesizing" : modeName === "THINKING" ? "RX // Processing" : "RX // Monitoring";
+
+      rot += mode.speed * dt * 0.6;
+      tilt = Math.sin(now * 0.0002) * 0.3 + 0.35;
+      const breathe = 1 + mode.breathe * Math.sin(now * 0.001 * mode.bf);
+      const radius = R * breathe;
+
+      ctx.globalCompositeOperation = "source-over";
+      ctx.fillStyle = C.fade;
+      ctx.fillRect(0, 0, W, H);
+
+      ctx.globalCompositeOperation = "lighter";
+      const coreRadius = radius * (modeName === "TALKING" ? 1.0 + 0.12 * Math.abs(Math.sin(now * 0.02)) : 0.95);
+      const glow = ctx.createRadialGradient(cx, cy, 0, cx, cy, coreRadius);
+      glow.addColorStop(0, `rgba(180,235,255,${0.5 * mode.glow})`);
+      glow.addColorStop(0.18, `rgba(79,210,255,${0.28 * mode.glow})`);
+      glow.addColorStop(0.5, `rgba(0,166,237,${0.12 * mode.glow})`);
+      glow.addColorStop(1, "rgba(0,166,237,0)");
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(cx, cy, coreRadius, 0, Math.PI * 2);
+      ctx.fill();
+
+      const cosR = Math.cos(rot);
+      const sinR = Math.sin(rot);
+      const cosT = Math.cos(tilt);
+      const sinT = Math.sin(tilt);
+
+      for (let i = 0; i < N; i += 1) {
+        const p = particles[i];
+        const speed = mode.speed * p.speed;
+        p.x += p.vx * speed * dt;
+        p.y += p.vy * speed * dt;
+        p.z += p.vz * speed * dt;
+
+        if (modeName === "THINKING") {
+          p.vx += (Math.random() - 0.5) * mode.chaos;
+          p.vy += (Math.random() - 0.5) * mode.chaos;
+          p.vz += (Math.random() - 0.5) * mode.chaos;
+        }
+
+        const len = Math.hypot(p.x, p.y, p.z) || 1;
+        p.x /= len;
+        p.y /= len;
+        p.z /= len;
+
+        const dot = p.vx * p.x + p.vy * p.y + p.vz * p.z;
+        p.vx -= dot * p.x;
+        p.vy -= dot * p.y;
+        p.vz -= dot * p.z;
+        const velocityLength = Math.hypot(p.vx, p.vy, p.vz) || 1;
+        p.vx /= velocityLength;
+        p.vy /= velocityLength;
+        p.vz /= velocityLength;
+
+        let rr = radius;
+        if (modeName === "THINKING") rr = radius * (1 + 0.20 * Math.sin(now * 0.0013 + p.phase * 3) + 0.07 * Math.sin(now * 0.004 + p.phase * 7));
+        else if (modeName === "TALKING") rr = radius * (1.0 + 0.03 * Math.sin(now * 0.012 + p.phase * 4));
+        else rr = radius * (1 + 0.014 * Math.sin(now * 0.001 + p.phase * 2));
+
+        const X = p.x * rr;
+        const Y = p.y * rr;
+        const Z = p.z * rr;
+        const X1 = X * cosR + Z * sinR;
+        const Z1 = -X * sinR + Z * cosR;
+        const Y1 = Y * cosT - Z1 * sinT;
+        const Z2 = Y * sinT + Z1 * cosT;
+        const depth = (Z2 / radius + 1) / 2;
+        sx[i] = cx + X1;
+        sy[i] = cy + Y1;
+        sz[i] = Z2;
+        sa[i] = 0.18 + depth * 0.82;
+        ss[i] = 0.8 + depth * 1.9;
+        connected[i] = 0;
+      }
+
+      const grid = new Map();
+      for (let i = 0; i < N; i += 1) {
+        const gx = (sx[i] / cell) | 0;
+        const gy = (sy[i] / cell) | 0;
+        const key = `${gx},${gy}`;
+        let bucket = grid.get(key);
+        if (!bucket) {
+          bucket = [];
+          grid.set(key, bucket);
+        }
+        bucket.push(i);
+      }
+
+      ctx.lineWidth = 0.7;
+      const d2max = 30 * 30;
+      for (let i = 0; i < N; i += 1) {
+        if (connected[i] >= 2) continue;
+        const gx = (sx[i] / cell) | 0;
+        const gy = (sy[i] / cell) | 0;
+        for (let ox = -1; ox <= 1 && connected[i] < 2; ox += 1) {
+          for (let oy = -1; oy <= 1 && connected[i] < 2; oy += 1) {
+            const bucket = grid.get(`${gx + ox},${gy + oy}`);
+            if (!bucket) continue;
+            for (let bi = 0; bi < bucket.length; bi += 1) {
+              const j = bucket[bi];
+              if (j <= i || connected[j] >= 2) continue;
+              const dx = sx[i] - sx[j];
+              const dy = sy[i] - sy[j];
+              const distance = dx * dx + dy * dy;
+              if (distance < d2max && Math.abs(sz[i] - sz[j]) < radius * 0.45) {
+                const alpha = (1 - distance / d2max) * Math.min(sa[i], sa[j]) * 0.5;
+                ctx.strokeStyle = `rgba(0,166,237,${alpha.toFixed(3)})`;
+                ctx.beginPath();
+                ctx.moveTo(sx[i], sy[i]);
+                ctx.lineTo(sx[j], sy[j]);
+                ctx.stroke();
+                connected[i] += 1;
+                connected[j] += 1;
+                if (connected[i] >= 2) break;
+              }
+            }
+          }
+        }
+      }
+
+      for (let i = 0; i < N; i += 1) {
+        const p = particles[i];
+        const alpha = sa[i];
+        const size = ss[i];
+        let color;
+        if (p.color > 0.85) color = "193,224,255";
+        else if (p.color > 0.5) color = "79,210,255";
+        else color = "0,166,237";
+        ctx.fillStyle = `rgba(${color},${alpha.toFixed(3)})`;
+        ctx.fillRect(sx[i] - size / 2, sy[i] - size / 2, size, size);
+      }
+
+      drawSatellites(now);
+      drawWave(now, mode.audio);
+      ctx.globalCompositeOperation = "source-over";
+
+      if (!reduced) state.raf = requestAnimationFrame(frame);
+    };
+
+    const drawStatic = () => {
+      state.mode = "IDLE";
+      ctx.fillStyle = "#03100b";
+      ctx.fillRect(0, 0, W, H);
+      frame(performance.now());
+      if (state.raf) cancelAnimationFrame(state.raf);
+      drawWave(0, 0.4);
+    };
+
+    const resize = () => {
+      sizeOrb();
+      sizeWave();
+      if (reduced) drawStatic();
+    };
+
+    sizeOrb();
+    sizeWave();
+    if (reduced) drawStatic();
+    else state.raf = requestAnimationFrame(frame);
+
+    window.addEventListener("resize", resize);
+    if (window.ResizeObserver) {
+      state.resizeObserver = new ResizeObserver(resize);
+      state.resizeObserver.observe(cv);
+      state.resizeObserver.observe(wave);
+    }
+  }
+
+  function cleanup() {
+    if (state.raf) cancelAnimationFrame(state.raf);
+    timers.forEach(({ id, kind }) => {
+      if (kind === "timeout") clearTimeout(id);
+      else clearInterval(id);
+    });
+    if (state.resizeObserver) state.resizeObserver.disconnect();
+  }
+
+  function init() {
+    initTopbar();
+    initVitals();
+    initOKRs();
+    initAgents();
+    initBudget();
+    initLogs();
+    initButtons();
+    initCanvases();
+    window.addEventListener("pagehide", cleanup, { once: true });
+  }
+
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init);
+  else init();
+})();
+</script>
+</body>
+</html>
