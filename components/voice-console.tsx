@@ -153,14 +153,14 @@ export function VoiceConsole({ messages, onMessagesChange, onModeChange }: Voice
       const payload = (await response.json()) as JarvisResponse;
 
       if (!response.ok || !payload.reply) {
-        throw new Error(payload.error || "Jarvis route failed.");
+        throw new Error(payload.error || "Erik route failed.");
       }
 
       const assistantMessage = newMessage("assistant", payload.reply, payload.mock);
       onMessagesChange([...nextMessages, assistantMessage]);
       await speak(payload.reply);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Jarvis route failed.");
+      setError(err instanceof Error ? err.message : "Erik route failed.");
     } finally {
       setIsThinking(false);
     }
@@ -233,7 +233,7 @@ export function VoiceConsole({ messages, onMessagesChange, onModeChange }: Voice
 
   return (
     <section className="rounded-md border border-primary/20 bg-black/20 p-3">
-      <PanelHeading title="Jarvis voice" meta={status}>
+      <PanelHeading title="Erik voice" meta={status}>
         <Badge variant={voiceMock ? "warning" : "success"} className="hidden sm:inline-flex">
           {voiceMock ? "Demo voices" : "ElevenLabs"}
         </Badge>
@@ -259,7 +259,7 @@ export function VoiceConsole({ messages, onMessagesChange, onModeChange }: Voice
             setDraft(event.target.value);
             transcriptRef.current = event.target.value;
           }}
-          placeholder={speechSupported ? "Ask Jarvis..." : "Type to Jarvis..."}
+          placeholder={speechSupported ? "Ask Erik..." : "Type to Erik..."}
           className="min-h-20"
         />
 
@@ -304,7 +304,7 @@ export function VoiceConsole({ messages, onMessagesChange, onModeChange }: Voice
                   )}
                 >
                   <div className="mb-1 text-[9px] font-extrabold uppercase tracking-[0.14em] opacity-70">
-                    {message.role === "assistant" ? "Jarvis" : "Operator"}
+                    {message.role === "assistant" ? "Erik" : "Operator"}
                     {message.mock ? " // Demo" : ""}
                   </div>
                   {message.content}

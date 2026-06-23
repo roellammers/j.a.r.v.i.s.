@@ -268,7 +268,7 @@ function BudgetPanel() {
   const [view, setView] = useState<"allocation" | "month">("allocation");
 
   return (
-    <Card className="mx-4 mb-4 shrink-0 p-4 lg:mx-4">
+    <Card className="mx-4 mb-4 shrink-0 p-4 md:mb-16 lg:mx-4">
       <PanelHeading title="Marketing budget // FY2026" amber>
         <span className="hidden shrink-0 items-center gap-1.5 text-[9px] font-extrabold uppercase tracking-[0.14em] text-[#7ee0a8] sm:inline-flex">
           <Dot className="animate-jarvis-blink" />
