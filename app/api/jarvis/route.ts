@@ -1,7 +1,12 @@
-import { extractResponseText, localJarvisReply, toResponseInput } from "@/lib/jarvis";
+import { localJarvisReply } from "@/lib/jarvis";
+import { askErikViaHermes } from "@/lib/hermes";
 import type { JarvisMessage } from "@/types/jarvis";
 
 export const runtime = "nodejs";
+
+// The local Hermes bridge can take longer than a normal API call because it
+// starts a real Erik/CMO profile turn. Keep this route dynamic and local-first.
+export const dynamic = "force-dynamic";
 
 type JarvisRequest = {
   message?: unknown;
@@ -36,44 +41,27 @@ export async function POST(request: Request) {
     return Response.json({ error: "Message is too long." }, { status: 413 });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  const model = process.env.OPENAI_MODEL || "gpt-5-mini";
-
-  if (!apiKey) {
+  if (process.env.HERMES_BRIDGE_DISABLED === "1") {
     return Response.json({
       reply: localJarvisReply(message),
       model: "local-demo",
+      profile: "demo",
       mock: true
     });
   }
 
-  const upstream = await fetch("https://api.openai.com/v1/responses", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model,
-      input: toResponseInput(history, message)
-    })
-  });
+  try {
+    const result = await askErikViaHermes(message, history);
 
-  const payload = await upstream.json().catch(() => null);
-
-  if (!upstream.ok) {
-    const error = payload && typeof payload === "object" && "error" in payload
-      ? payload.error
-      : "OpenAI request failed.";
-
-    return Response.json({ error }, { status: upstream.status });
+    return Response.json({
+      reply: result.reply,
+      model: `hermes:${result.command}`,
+      profile: result.profile,
+      mock: result.mock
+    });
+  } catch (error) {
+    return Response.json({
+      error: error instanceof Error ? error.message : "Local Hermes bridge failed."
+    }, { status: 502 });
   }
-
-  const reply = extractResponseText(payload) || "I received the request, but no response text was returned.";
-
-  return Response.json({
-    reply,
-    model,
-    mock: false
-  });
 }
