@@ -37,6 +37,14 @@ function buildPrompt(message: string, history: JarvisMessage[]) {
 }
 
 export async function askErikViaHermes(message: string, history: JarvisMessage[]): Promise<HermesBridgeResult> {
+  const bridgeUrl = process.env.HERMES_BRIDGE_URL;
+
+  // If HTTP bridge URL is set, use that instead of local command
+  if (bridgeUrl) {
+    return askErikViaHttp(bridgeUrl, message, history);
+  }
+
+  // Otherwise fall back to local command
   const command = process.env.HERMES_PROFILE_COMMAND || "cmo";
   const profile = process.env.HERMES_PROFILE_NAME || "cmo";
   const timeoutMs = Number.parseInt(process.env.HERMES_BRIDGE_TIMEOUT_MS || "180000", 10);
@@ -74,3 +82,32 @@ export async function askErikViaHermes(message: string, history: JarvisMessage[]
     throw new Error(`Could not reach Erik through the local Hermes bridge: ${detail}`);
   }
 }
+
+async function askErikViaHttp(url: string, message: string, history: JarvisMessage[]): Promise<HermesBridgeResult> {
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ message, history })
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => "Unknown HTTP error");
+    throw new Error(`HTTP bridge failed (${response.status}): ${errorText}`);
+  }
+
+  const payload = await response.json();
+
+  if (payload.error) {
+    throw new Error(payload.error);
+  }
+
+  return {
+    reply: payload.reply || "Erik responded, but no reply was returned.",
+    command: payload.command || "http",
+    profile: payload.profile || "cmo",
+    mock: payload.mock || false
+  };
+}
+
